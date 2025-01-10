@@ -16,6 +16,18 @@ static unsigned int get_hash(const hash* h, unsigned int key)
 
 	// ToDo: ハッシュ関数としてhash_funcを使った
 	// オープンアドレス法によるハッシュ値を求める
+
+	unsigned int n = hash_func(key, h->max_size);
+
+	while (n < h->max_size) 
+	{
+		if (h->nodes[n].key == ~0 || h->nodes[n].key == key)
+		{
+			return n;
+		}
+
+		n++;
+	}
 	return ~0;
 }
 
@@ -59,6 +71,20 @@ bool add(hash* h, unsigned int key, const char* value)
 
 	// ToDo: ハッシュ関数としてhash_funcを使った
 	// オープンアドレス法によりキーを追加
+
+	unsigned int n = get_hash(h, key);
+
+	if (n != ~0) 
+	{
+		h->nodes[n].key = key;
+
+		for (int i = 0; i < 256; i++) 
+		{
+			h->nodes[n].value[i] = value[i];
+		}
+		return true;
+	}
+
 	return false;
 }
 
@@ -68,6 +94,13 @@ const char* get(const hash* h, unsigned int key)
 	if (key == ~0) return NULL;
 
 	// ToDo: keyから値が格納されている場所を求め、値の場所を返す
+	for (int i = 0; i < h->max_size; i++) 
+	{
+		if (h->nodes[i].key == key) 
+		{
+			return h->nodes[i].value;
+		}
+	}
 	return NULL;
 }
 
